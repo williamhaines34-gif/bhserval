@@ -341,7 +341,7 @@
 
   /* ─── MAIN ─── */
   .main {
-    overflow-y: auto;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
   }
@@ -357,6 +357,7 @@
     position: relative;
     overflow: hidden;
     isolation: isolate;
+    flex-shrink: 0;
   }
 
   /* Serval purple glow blob — like the deck's bottom gradient */
@@ -436,6 +437,7 @@
     display: flex;
     align-items: center;
     gap: 14px;
+    flex-shrink: 0;
   }
 
   .progress-label {
@@ -477,7 +479,11 @@
   .content-area {
     padding: 24px 32px 0;
     flex: 1;
+    overflow-y: auto;
   }
+
+  .content-area::-webkit-scrollbar { width: 5px; }
+  .content-area::-webkit-scrollbar-thumb { background: var(--serval-border2); border-radius: 3px; }
 
   /* Step panels */
   .step-panel {
@@ -784,10 +790,8 @@
     align-items: center;
     padding: 16px 32px 20px;
     border-top: 1px solid var(--serval-border);
-    margin-top: 20px;
     background: var(--serval-black);
-    position: sticky;
-    bottom: 0;
+    flex-shrink: 0;
   }
 
   .btn {
@@ -1015,7 +1019,7 @@
     </div>
 
     <!-- Content area -->
-    <div class="content-area">
+    <div class="content-area" id="content-scroll">
 
       <div class="resolved-banner" id="resolved-banner">
         <div class="resolved-icon">✦</div>
@@ -1406,7 +1410,7 @@
         btnFwd.style.pointerEvents = '';
       }
 
-      document.getElementById('main-scroll').scrollTo({ top: 0, behavior: 'smooth' });
+      document.getElementById('content-scroll').scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function resolveIt() {
