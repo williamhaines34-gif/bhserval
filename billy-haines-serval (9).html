@@ -1299,11 +1299,14 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    let cur = 0;
-    const TOTAL = 6;
-    const slaStart = Date.now();
+    var cur = 0;
+    var maxReached = 0;
+    var resolved = false;
+    var TOTAL = 6;
+    var slaStart = Date.now();
+    var postedActivities = {};
 
-    const actLog = [
+    var actLog = [
       { who: 'BH', name: 'Billy Haines', text: 'Root cause analysis complete. Core values system healthy — all four pillars active.' },
       { who: 'BH', name: 'Billy Haines', text: 'Performance diagnostics done. $4M+ ARR confirmed. KPIs in the green.' },
       { who: 'BH', name: 'Billy Haines', text: 'Stakeholder attestations collected. References from CEO, RVP, AVP, and partner confirmed.' },
@@ -1311,51 +1314,61 @@
       { who: 'SV', name: 'Serval System', text: 'All 7 resolution checks PASSED. Recommendation: HIRE. Closing ticket.' },
     ];
 
-    // SLA timer
     setInterval(function () {
-      const s = Math.floor((Date.now() - slaStart) / 1000);
-      const m = String(Math.floor(s / 60)).padStart(2, '0');
-      const sc = String(s % 60).padStart(2, '0');
+      var s = Math.floor((Date.now() - slaStart) / 1000);
+      var m = String(Math.floor(s / 60)).padStart(2, '0');
+      var sc = String(s % 60).padStart(2, '0');
       document.getElementById('sla-clock').textContent = 'SLA ' + m + ':' + sc;
     }, 1000);
 
-    // Step row clicks
+    function postActivityForStep(step) {
+      if (step > 0 && step < TOTAL && !postedActivities[step]) {
+        postedActivities[step] = true;
+        addActivity(actLog[step - 1]);
+      }
+    }
+
     document.querySelectorAll('.step-row').forEach(function (row) {
       row.addEventListener('click', function () {
-        const n = parseInt(row.getAttribute('data-step'));
-        if (n <= cur + 1) {
-          if (n > cur) addActivity(actLog[n - 1]);
+        var n = parseInt(row.getAttribute('data-step'));
+        if (n <= maxReached) {
+          cur = n;
+          updateUI();
+        } else if (!resolved && n === maxReached + 1) {
+          postActivityForStep(n);
+          maxReached = n;
           cur = n;
           updateUI();
         }
       });
     });
 
-    // Nav buttons
     document.getElementById('btn-back').addEventListener('click', function () {
       if (cur > 0) { cur--; updateUI(); }
     });
 
     document.getElementById('btn-fwd').addEventListener('click', function () {
       if (cur < TOTAL - 1) {
-        cur++;
-        addActivity(actLog[cur - 1]);
+        var next = cur + 1;
+        if (next > maxReached) {
+          postActivityForStep(next);
+          maxReached = next;
+        }
+        cur = next;
         updateUI();
-      } else {
+      } else if (!resolved) {
         resolveIt();
       }
     });
 
     function updateUI() {
-      // Show correct panel
       document.querySelectorAll('.step-panel').forEach(function (p, i) {
         p.classList.toggle('visible', i === cur);
       });
 
-      // Sidebar step states
       document.querySelectorAll('.step-row').forEach(function (r, i) {
         r.classList.remove('active', 'done');
-        const node = r.querySelector('.step-node');
+        var node = r.querySelector('.step-node');
         if (i < cur) {
           r.classList.add('done');
           node.textContent = '✓';
@@ -1367,44 +1380,49 @@
         }
       });
 
-      // Progress bar
-      const pct = Math.round((cur / (TOTAL - 1)) * 100);
+      var pct = resolved ? 100 : Math.round((cur / (TOTAL - 1)) * 100);
       document.getElementById('prog-fill').style.width = pct + '%';
       document.getElementById('prog-num').textContent = pct + '%';
 
-      // Step indicator
       document.getElementById('nav-indicator').textContent = 'Step ' + (cur + 1) + ' of ' + TOTAL;
 
-      // Back button
       document.getElementById('btn-back').classList.toggle('off', cur === 0);
 
-      // Forward button label
-      const btnFwd = document.getElementById('btn-fwd');
-      if (cur === TOTAL - 1) {
+      var btnFwd = document.getElementById('btn-fwd');
+      if (cur === TOTAL - 1 && resolved) {
+        btnFwd.textContent = '✓ Ticket Closed';
+        btnFwd.className = 'btn btn-resolve';
+        btnFwd.style.opacity = '0.5';
+        btnFwd.style.pointerEvents = 'none';
+      } else if (cur === TOTAL - 1) {
         btnFwd.textContent = '✦ Close Ticket';
         btnFwd.className = 'btn btn-resolve';
+        btnFwd.style.opacity = '';
+        btnFwd.style.pointerEvents = '';
       } else {
         btnFwd.textContent = 'Next Step →';
         btnFwd.className = 'btn btn-purple';
+        btnFwd.style.opacity = '';
+        btnFwd.style.pointerEvents = '';
       }
 
       document.getElementById('main-scroll').scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function resolveIt() {
+      if (resolved) return;
+      resolved = true;
       document.getElementById('resolved-banner').classList.add('show');
-      const badge = document.getElementById('status-badge');
+      var badge = document.getElementById('status-badge');
       badge.className = 'badge-status badge-resolved';
       badge.textContent = '● Resolved';
-      document.getElementById('prog-fill').style.width = '100%';
-      document.getElementById('prog-num').textContent = '100%';
       addActivity({ who: 'SV', name: 'Serval System', text: 'INC-20260325-BH RESOLVED. Billy Haines confirmed. Hire recommended.' });
-      document.getElementById('main-scroll').scrollTo({ top: 0, behavior: 'smooth' });
+      updateUI();
     }
 
     function addActivity(msg) {
-      const feed = document.getElementById('activity-feed');
-      const el = document.createElement('div');
+      var feed = document.getElementById('activity-feed');
+      var el = document.createElement('div');
       el.className = 'activity-item';
       el.style.animation = 'stepIn 0.3s ease';
       el.innerHTML =
