@@ -1,0 +1,1420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>INC-20260325-BH · Serval ITSM</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* Serval Brand Colors — extracted from pitch deck */
+    --serval-black:     #0a0a0c;
+    --serval-near-black:#111114;
+    --serval-surface:   #16161a;
+    --serval-surface2:  #1c1c22;
+    --serval-border:    #252530;
+    --serval-border2:   #32323f;
+
+    /* Serval Purple Gradient (from deck: dark purple bottom, near-black top) */
+    --serval-purple-deep:   #3d1f6e;
+    --serval-purple:        #5b2d8e;
+    --serval-purple-mid:    #7b3fbe;
+    --serval-purple-light:  #9b5fd4;
+    --serval-purple-glow:   rgba(91, 45, 142, 0.35);
+    --serval-purple-subtle: rgba(91, 45, 142, 0.12);
+
+    /* Text */
+    --text-primary:   #ffffff;
+    --text-secondary: #d4d4e8;
+    --text-muted:     #9898b0;
+    --text-dim:       #5a5a70;
+
+    /* Status */
+    --status-active:  #7b3fbe;
+    --status-warn:    #e8833a;
+    --status-crit:    #e8455a;
+    --status-ok:      #2ecc8f;
+
+    --sans: 'DM Sans', sans-serif;
+    --mono: 'DM Mono', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--serval-black);
+    color: var(--text-primary);
+    font-family: var(--sans);
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.6;
+    overflow: hidden;
+  }
+
+  /* ─── SERVAL S LOGO SVG ─── */
+  .serval-logo-mark {
+    width: 22px;
+    height: 22px;
+  }
+
+  /* ─── TOPBAR ─── */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    height: 50px;
+    background: var(--serval-near-black);
+    border-bottom: 1px solid var(--serval-border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .brand-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.3px;
+  }
+
+  .brand-divider {
+    width: 1px;
+    height: 18px;
+    background: var(--serval-border2);
+  }
+
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  .breadcrumb .crumb-active {
+    color: var(--text-secondary);
+  }
+
+  .breadcrumb .sep { color: var(--serval-border2); }
+
+  .topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  .sla-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    background: rgba(232, 69, 90, 0.1);
+    border: 1px solid rgba(232, 69, 90, 0.25);
+    border-radius: 20px;
+    color: var(--status-crit);
+    font-size: 11px;
+    font-weight: 500;
+  }
+
+  .pulse-dot {
+    width: 5px;
+    height: 5px;
+    background: var(--status-crit);
+    border-radius: 50%;
+    animation: blink 1.2s ease-in-out infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.2; }
+  }
+
+  .env-tag {
+    padding: 3px 8px;
+    background: var(--serval-purple-subtle);
+    border: 1px solid rgba(91, 45, 142, 0.3);
+    border-radius: 3px;
+    color: var(--serval-purple-light);
+    font-size: 10px;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+  }
+
+  /* ─── LAYOUT ─── */
+  .layout {
+    display: grid;
+    grid-template-columns: 264px 1fr 300px;
+    height: calc(100vh - 50px);
+    overflow: hidden;
+  }
+
+  /* ─── LEFT SIDEBAR ─── */
+  .sidebar-left {
+    background: var(--serval-near-black);
+    border-right: 1px solid var(--serval-border);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+
+  .sidebar-left::-webkit-scrollbar { width: 4px; }
+  .sidebar-left::-webkit-scrollbar-thumb { background: var(--serval-border2); border-radius: 2px; }
+
+  .s-section {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--serval-border);
+  }
+
+  .s-section-title {
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 500;
+    color: var(--text-dim);
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .meta-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    gap: 8px;
+  }
+
+  .meta-key {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-muted);
+    flex-shrink: 0;
+  }
+
+  .meta-val {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-secondary);
+    text-align: right;
+  }
+
+  .badge-p1 {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--status-crit);
+    background: rgba(232, 69, 90, 0.1);
+    border: 1px solid rgba(232, 69, 90, 0.2);
+    padding: 2px 7px;
+    border-radius: 3px;
+    letter-spacing: 0.3px;
+  }
+
+  .badge-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 3px;
+  }
+
+  .badge-inprogress {
+    background: var(--serval-purple-subtle);
+    border: 1px solid rgba(91, 45, 142, 0.3);
+    color: var(--serval-purple-light);
+  }
+
+  .badge-resolved {
+    background: rgba(46, 204, 143, 0.1);
+    border: 1px solid rgba(46, 204, 143, 0.25);
+    color: var(--status-ok);
+  }
+
+  .assignee-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background: var(--serval-surface);
+    border: 1px solid var(--serval-border);
+    border-radius: 8px;
+  }
+
+  .avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--serval-purple), var(--serval-purple-mid));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+    font-family: var(--mono);
+    letter-spacing: 0.5px;
+  }
+
+  .assignee-name { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+  .assignee-role { font-size: 10px; font-family: var(--mono); color: var(--text-muted); margin-top: 1px; }
+
+  /* ─── STEP LIST ─── */
+  .step-list { display: flex; flex-direction: column; gap: 2px; }
+
+  .step-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.15s;
+    border: 1px solid transparent;
+  }
+
+  .step-row:hover { background: var(--serval-surface); }
+
+  .step-row.active {
+    background: var(--serval-purple-subtle);
+    border-color: rgba(91, 45, 142, 0.3);
+  }
+
+  .step-row.done { opacity: 0.55; }
+
+  .step-node {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1.5px solid var(--serval-border2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    font-family: var(--mono);
+    font-weight: 500;
+    color: var(--text-muted);
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+
+  .step-row.done .step-node {
+    background: var(--serval-purple);
+    border-color: var(--serval-purple);
+    color: #fff;
+    font-size: 11px;
+  }
+
+  .step-row.active .step-node {
+    border-color: var(--serval-purple-mid);
+    color: var(--serval-purple-light);
+    background: rgba(91, 45, 142, 0.2);
+  }
+
+  .step-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    line-height: 1.3;
+    font-weight: 400;
+  }
+
+  .step-row.active .step-label { color: var(--text-primary); font-weight: 500; }
+
+  /* ─── MAIN ─── */
+  .main {
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .main::-webkit-scrollbar { width: 5px; }
+  .main::-webkit-scrollbar-thumb { background: var(--serval-border2); border-radius: 3px; }
+
+  /* Hero header — Serval gradient style */
+  .ticket-hero {
+    background: linear-gradient(180deg, #1a0d2e 0%, var(--serval-black) 100%);
+    padding: 28px 32px 24px;
+    border-bottom: 1px solid var(--serval-border);
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  /* Serval purple glow blob — like the deck's bottom gradient */
+  .ticket-hero::before {
+    content: '';
+    position: absolute;
+    bottom: -60px;
+    left: -40px;
+    width: 340px;
+    height: 200px;
+    background: radial-gradient(ellipse, rgba(91,45,142,0.4) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .ticket-hero::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    opacity: 0.4;
+    z-index: 0;
+  }
+
+  .ticket-hero .ticket-id-row,
+  .ticket-hero .ticket-title,
+  .ticket-hero .ticket-sub {
+    position: relative;
+    z-index: 2;
+  }
+
+  .ticket-id-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .ticket-id-chip {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    background: var(--serval-surface);
+    border: 1px solid var(--serval-border);
+    padding: 3px 9px;
+    border-radius: 4px;
+  }
+
+  .ticket-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.3;
+    letter-spacing: -0.5px;
+    margin-bottom: 6px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .ticket-title .purple { color: var(--serval-purple-light); }
+
+  .ticket-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-style: italic;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Progress strip */
+  .progress-strip {
+    padding: 10px 32px;
+    background: var(--serval-near-black);
+    border-bottom: 1px solid var(--serval-border);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .progress-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-muted);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+
+  .progress-track {
+    flex: 1;
+    height: 3px;
+    background: var(--serval-border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--serval-purple), var(--serval-purple-light));
+    border-radius: 2px;
+    transition: width 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 0%;
+  }
+
+  .progress-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--serval-purple-light);
+    font-weight: 500;
+    flex-shrink: 0;
+    min-width: 34px;
+    text-align: right;
+  }
+
+  /* Content area */
+  .content-area {
+    padding: 24px 32px 0;
+    flex: 1;
+  }
+
+  /* Step panels */
+  .step-panel {
+    display: none;
+    animation: stepIn 0.3s ease;
+  }
+
+  .step-panel.visible { display: block; }
+
+  @keyframes stepIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .panel-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .panel-step-num {
+    width: 30px;
+    height: 30px;
+    background: var(--serval-purple-subtle);
+    border: 1px solid rgba(91, 45, 142, 0.35);
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--serval-purple-light);
+    flex-shrink: 0;
+  }
+
+  .panel-step-type {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-muted);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+  }
+
+  .panel-step-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: -0.3px;
+  }
+
+  /* Cards */
+  .card {
+    background: var(--serval-near-black);
+    border: 1px solid var(--serval-border);
+    border-radius: 8px;
+    padding: 18px 20px;
+    margin-bottom: 14px;
+  }
+
+  .card-title {
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 500;
+    color: var(--text-dim);
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--serval-border);
+  }
+
+  /* Terminal */
+  .terminal {
+    background: #0c0c0f;
+    border: 1px solid var(--serval-border);
+    border-radius: 6px;
+    padding: 14px 16px;
+    font-family: var(--mono);
+    font-size: 11px;
+    line-height: 1.8;
+  }
+
+  .t-prompt { color: var(--serval-purple-light); }
+  .t-cmd    { color: var(--text-secondary); }
+  .t-out    { color: var(--text-muted); }
+  .t-key    { color: var(--serval-purple-mid); }
+  .t-val    { color: #e8c97a; }
+  .t-ok     { color: var(--status-ok); }
+
+  /* Findings */
+  .findings { display: flex; flex-direction: column; gap: 9px; }
+
+  .finding {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 11px 13px;
+    background: var(--serval-surface);
+    border-radius: 6px;
+    border-left: 2px solid var(--serval-purple);
+  }
+
+  .finding-icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+
+  .finding-text {
+    font-size: 12px;
+    color: var(--text-secondary);
+    line-height: 1.55;
+  }
+
+  .finding-text strong { color: var(--serval-purple-light); font-weight: 600; }
+
+  /* Stats */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 9px;
+  }
+
+  .stat {
+    background: var(--serval-surface);
+    border: 1px solid var(--serval-border);
+    border-radius: 6px;
+    padding: 14px 12px;
+    text-align: center;
+  }
+
+  .stat-val {
+    font-family: var(--mono);
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--serval-purple-light);
+    line-height: 1;
+    margin-bottom: 5px;
+  }
+
+  .stat-lbl {
+    font-size: 10px;
+    color: var(--text-muted);
+    font-family: var(--mono);
+    line-height: 1.3;
+  }
+
+  /* Log */
+  .log-row {
+    display: flex;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--serval-border);
+    font-family: var(--mono);
+    font-size: 10px;
+  }
+
+  .log-row:last-child { border-bottom: none; }
+  .log-src { color: var(--text-dim); flex-shrink: 0; width: 70px; }
+  .log-lvl { flex-shrink: 0; width: 55px; }
+  .log-lvl.ok   { color: var(--status-ok); }
+  .log-lvl.ev   { color: var(--status-warn); }
+  .log-lvl.info { color: var(--serval-purple-light); }
+  .log-msg { color: var(--text-muted); }
+  .log-msg strong { color: var(--text-secondary); }
+
+  /* Values grid */
+  .vals-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 9px;
+  }
+
+  .val-card {
+    background: var(--serval-surface);
+    border: 1px solid var(--serval-border);
+    border-radius: 6px;
+    padding: 13px;
+    border-top: 2px solid var(--serval-purple);
+  }
+
+  .val-card.b { border-top-color: var(--serval-purple-mid); }
+  .val-card.c { border-top-color: var(--serval-purple-deep); }
+  .val-card.d { border-top-color: var(--serval-purple-light); }
+
+  .val-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+    font-family: var(--mono);
+    letter-spacing: 0.2px;
+  }
+
+  .val-list { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+
+  .val-list li {
+    font-size: 11px;
+    color: var(--text-muted);
+    display: flex;
+    gap: 6px;
+    line-height: 1.4;
+  }
+
+  .val-list li::before {
+    content: '+';
+    color: var(--serval-purple-mid);
+    font-weight: 700;
+    font-family: var(--mono);
+    flex-shrink: 0;
+  }
+
+  /* Quotes */
+  .quote {
+    background: var(--serval-surface);
+    border: 1px solid var(--serval-border);
+    border-left: 3px solid var(--serval-purple);
+    border-radius: 0 6px 6px 0;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+  }
+
+  .quote-text {
+    font-size: 11px;
+    color: var(--text-secondary);
+    line-height: 1.65;
+    font-style: italic;
+    margin-bottom: 7px;
+  }
+
+  .quote-src {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-muted);
+  }
+
+  .quote-src strong { color: var(--serval-purple-light); }
+
+  /* CTA */
+  .cta-card {
+    background: linear-gradient(135deg, rgba(61,31,110,0.3), rgba(91,45,142,0.15));
+    border: 1px solid rgba(91, 45, 142, 0.35);
+    border-radius: 8px;
+    padding: 22px;
+    text-align: center;
+    margin-top: 6px;
+  }
+
+  .cta-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+    letter-spacing: -0.3px;
+  }
+
+  .cta-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+    line-height: 1.55;
+  }
+
+  .contact-chips {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .contact-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    background: var(--serval-surface2);
+    border: 1px solid var(--serval-border2);
+    border-radius: 20px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-secondary);
+  }
+
+  /* RESOLVED banner */
+  .resolved-banner {
+    display: none;
+    background: linear-gradient(135deg, rgba(46,204,143,0.06), rgba(91,45,142,0.08));
+    border: 1px solid rgba(46, 204, 143, 0.2);
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 18px;
+    animation: stepIn 0.4s ease;
+  }
+
+  .resolved-banner.show { display: block; }
+  .resolved-icon { font-size: 28px; margin-bottom: 8px; }
+  .resolved-title { font-family: var(--mono); font-size: 13px; font-weight: 500; color: var(--status-ok); margin-bottom: 4px; }
+  .resolved-sub { font-size: 11px; color: var(--text-muted); }
+
+  /* Nav */
+  .step-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 32px 20px;
+    border-top: 1px solid var(--serval-border);
+    margin-top: 20px;
+    background: var(--serval-black);
+    position: sticky;
+    bottom: 0;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-family: var(--sans);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+    letter-spacing: 0.1px;
+  }
+
+  .btn-ghost {
+    background: transparent;
+    border: 1px solid var(--serval-border2);
+    color: var(--text-muted);
+  }
+
+  .btn-ghost:hover { background: var(--serval-surface); color: var(--text-secondary); }
+  .btn-ghost.off { opacity: 0.25; pointer-events: none; }
+
+  .btn-purple {
+    background: linear-gradient(135deg, var(--serval-purple), var(--serval-purple-mid));
+    color: #fff;
+    box-shadow: 0 2px 14px rgba(91, 45, 142, 0.4);
+  }
+
+  .btn-purple:hover {
+    background: linear-gradient(135deg, var(--serval-purple-mid), var(--serval-purple-light));
+    box-shadow: 0 4px 20px rgba(91, 45, 142, 0.55);
+    transform: translateY(-1px);
+  }
+
+  .btn-resolve {
+    background: linear-gradient(135deg, var(--serval-purple-deep), var(--serval-purple));
+    color: #fff;
+    padding: 9px 22px;
+    box-shadow: 0 2px 20px rgba(91, 45, 142, 0.45);
+    font-size: 12px;
+  }
+
+  .btn-resolve:hover {
+    box-shadow: 0 4px 28px rgba(91, 45, 142, 0.65);
+    transform: translateY(-1px);
+  }
+
+  .nav-indicator {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+  }
+
+  /* ─── RIGHT SIDEBAR ─── */
+  .sidebar-right {
+    background: var(--serval-near-black);
+    border-left: 1px solid var(--serval-border);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+
+  .sidebar-right::-webkit-scrollbar { width: 4px; }
+  .sidebar-right::-webkit-scrollbar-thumb { background: var(--serval-border2); border-radius: 2px; }
+
+  .activity-item {
+    display: flex;
+    gap: 9px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--serval-border);
+  }
+
+  .activity-item:last-child { border-bottom: none; }
+
+  .act-avatar {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--serval-surface2);
+    border: 1px solid var(--serval-border2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8px;
+    font-family: var(--mono);
+    font-weight: 500;
+    color: var(--serval-purple-light);
+    flex-shrink: 0;
+  }
+
+  .act-author { font-size: 11px; font-weight: 600; color: var(--text-primary); }
+  .act-text   { font-size: 11px; color: var(--text-muted); line-height: 1.4; }
+  .act-time   { font-family: var(--mono); font-size: 9px; color: var(--text-dim); margin-top: 2px; }
+
+  .tag-cloud { display: flex; flex-wrap: wrap; gap: 5px; }
+
+  .tag {
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .tag-purple {
+    background: var(--serval-purple-subtle);
+    border: 1px solid rgba(91,45,142,0.25);
+    color: var(--serval-purple-light);
+  }
+
+  .tag-grey {
+    background: var(--serval-surface);
+    border: 1px solid var(--serval-border);
+    color: var(--text-muted);
+  }
+
+  .related-ticket {
+    padding: 8px 10px;
+    background: var(--serval-surface);
+    border: 1px solid var(--serval-border);
+    border-radius: 5px;
+    font-family: var(--mono);
+    font-size: 9px;
+    margin-bottom: 5px;
+  }
+
+  .related-ticket .rt-id { color: var(--text-secondary); display: block; margin-bottom: 2px; }
+  .related-ticket .rt-desc { color: var(--text-dim); }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="brand">
+      <!-- Serval S logo mark in purple -->
+      <svg class="serval-logo-mark" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M22 6H14C11.8 6 10 7.8 10 10C10 12.2 11.8 14 14 14H18C20.2 14 22 15.8 22 18C22 20.2 20.2 22 18 22H8" stroke="white" stroke-width="3" stroke-linecap="round"/>
+        <path d="M10 10L16 16L10 22" stroke="#7b3fbe" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
+      </svg>
+      <span class="brand-name">Serval</span>
+    </div>
+    <div class="brand-divider"></div>
+    <div class="breadcrumb">
+      <span>Incidents</span>
+      <span class="sep">/</span>
+      <span>Active</span>
+      <span class="sep">/</span>
+      <span class="crumb-active">INC-20260325-BH</span>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="sla-pill">
+      <div class="pulse-dot"></div>
+      <span id="sla-clock">SLA 00:00</span>
+    </div>
+    <span class="env-tag">Hiring</span>
+    <span style="color:var(--serval-purple-light)">● Live</span>
+  </div>
+</div>
+
+<!-- 3-COL LAYOUT -->
+<div class="layout">
+
+  <!-- LEFT SIDEBAR -->
+  <div class="sidebar-left">
+    <div class="s-section">
+      <div class="s-section-title">Ticket Info</div>
+      <div class="meta-row"><span class="meta-key">ID</span><span class="meta-val" style="color:var(--serval-purple-light)">INC-20260325-BH</span></div>
+      <div class="meta-row"><span class="meta-key">Priority</span><span class="badge-p1">P1 CRITICAL</span></div>
+      <div class="meta-row"><span class="meta-key">Status</span><span class="badge-status badge-inprogress" id="status-badge">● In Progress</span></div>
+      <div class="meta-row"><span class="meta-key">Category</span><span class="meta-val">Talent / GTM</span></div>
+      <div class="meta-row"><span class="meta-key">Created</span><span class="meta-val">Mar 25, 2026</span></div>
+      <div class="meta-row"><span class="meta-key">SLA</span><span class="meta-val" style="color:var(--status-warn)">4 hour target</span></div>
+    </div>
+
+    <div class="s-section">
+      <div class="s-section-title">Assigned Resolver</div>
+      <div class="assignee-card">
+        <div class="avatar">BH</div>
+        <div>
+          <div class="assignee-name">Billy Haines</div>
+          <div class="assignee-role">AE Candidate · GTM Lead</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="s-section" style="flex:1">
+      <div class="s-section-title">Resolution Steps</div>
+      <div class="step-list" id="step-list">
+        <div class="step-row active" data-step="0"><div class="step-node">1</div><div class="step-label">Triage &amp; Initial Assessment</div></div>
+        <div class="step-row" data-step="1"><div class="step-node">2</div><div class="step-label">Root Cause Analysis</div></div>
+        <div class="step-row" data-step="2"><div class="step-node">3</div><div class="step-label">Performance Diagnostics</div></div>
+        <div class="step-row" data-step="3"><div class="step-node">4</div><div class="step-label">Stakeholder Validation</div></div>
+        <div class="step-row" data-step="4"><div class="step-node">5</div><div class="step-label">Remediation Plan</div></div>
+        <div class="step-row" data-step="5"><div class="step-node">6</div><div class="step-label">Resolution &amp; Close</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main" id="main-scroll">
+
+    <!-- Hero -->
+    <div class="ticket-hero">
+      <div class="ticket-id-row">
+        <span class="ticket-id-chip">INC-20260325-BH</span>
+        <span class="badge-p1">P1</span>
+      </div>
+      <div class="ticket-title">Critical Gap: Early-Stage AI GTM — <span class="purple">Account Executive Role Unfilled</span></div>
+      <div class="ticket-sub">Resolver assigned: William "Billy" Haines · Initiating resolution workflow…</div>
+    </div>
+
+    <!-- Progress -->
+    <div class="progress-strip">
+      <span class="progress-label">Resolution</span>
+      <div class="progress-track"><div class="progress-fill" id="prog-fill"></div></div>
+      <span class="progress-num" id="prog-num">0%</span>
+    </div>
+
+    <!-- Content area -->
+    <div class="content-area">
+
+      <div class="resolved-banner" id="resolved-banner">
+        <div class="resolved-icon">✦</div>
+        <div class="resolved-title">INCIDENT RESOLVED</div>
+        <div class="resolved-sub">INC-20260325-BH closed. GTM gap remediated. Billy Haines confirmed as the fix.</div>
+      </div>
+
+      <!-- ── STEP 0: TRIAGE ── -->
+      <div class="step-panel visible" id="panel-0">
+        <div class="panel-header">
+          <div class="panel-step-num">01</div>
+          <div>
+            <div class="panel-step-type">Step 1 of 6 · Triage</div>
+            <div class="panel-step-title">Initial Assessment — Who Is This Resolver?</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Resolver Profile Scan</div>
+          <div class="terminal">
+            <div><span class="t-prompt">$</span> <span class="t-cmd">serval triage --incident INC-20260325-BH</span></div>
+            <div class="t-out">Scanning resolver credentials...</div>
+            <br>
+            <div><span class="t-key">resolver.name</span>      = <span class="t-val">"William (Billy) Haines"</span></div>
+            <div><span class="t-key">resolver.email</span>     = <span class="t-val">"william.haines34&#64;gmail.com"</span></div>
+            <div><span class="t-key">resolver.phone</span>     = <span class="t-val">"949-769-1783"</span></div>
+            <div><span class="t-key">resolver.mode</span>      = <span class="t-val">"No Playbook Required"</span></div>
+            <div><span class="t-key">resolver.target</span>    = <span class="t-val">"Early-Stage AI · GTM Build"</span></div>
+            <div><span class="t-key">resolver.quota_hit</span> = <span class="t-val">"6 of 7 years"</span></div>
+            <br>
+            <div class="t-ok">✓ Resolver validated. Proceeding to full diagnostic.</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Triage Summary</div>
+          <div class="findings">
+            <div class="finding"><div class="finding-icon">🎯</div><div class="finding-text"><strong>Objective:</strong> Seeking a high-ownership role helping build an early-stage AI GTM org from the ground up into a category leader.</div></div>
+            <div class="finding"><div class="finding-icon">⚡</div><div class="finding-text"><strong>Approach:</strong> Excited to experiment, iterate, and execute scalable sales strategies. Shapes GTM motion — doesn't just follow one.</div></div>
+            <div class="finding"><div class="finding-icon">📈</div><div class="finding-text"><strong>Trajectory:</strong> Committed long-term — developing into enterprise seller → sales leader while scaling a durable, category-defining business.</div></div>
+            <div class="finding"><div class="finding-icon">🏔️</div><div class="finding-text"><strong>Character Signal:</strong> Hit quota 6/7 years in SaaS. Completed 100-mile ultramarathon. Built a live music business. Every challenge treated as a growth opportunity.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── STEP 1: ROOT CAUSE ── -->
+      <div class="step-panel" id="panel-1">
+        <div class="panel-header">
+          <div class="panel-step-num">02</div>
+          <div>
+            <div class="panel-step-type">Step 2 of 6 · Root Cause Analysis</div>
+            <div class="panel-step-title">What Drives This Resolver? Core Values Audit</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Values System Diagnostic</div>
+          <div class="vals-grid">
+            <div class="val-card">
+              <div class="val-title">🔥 Love of Challenges</div>
+              <ul class="val-list">
+                <li>Launched &amp; scaled 6-figure live music business in Park City, UT</li>
+                <li>20+ ultramarathons completed</li>
+                <li>Mountaineering: 1× 6k, 2× 5k, 6× 14k' summits</li>
+                <li>200-mile ultra goal: October 2026</li>
+              </ul>
+            </div>
+            <div class="val-card b">
+              <div class="val-title">🧠 Curiosity</div>
+              <ul class="val-list">
+                <li>Lifelong learner — nonstop podcast consumer</li>
+                <li>Deeply fascinated by AI and its impact on humanity</li>
+                <li>Drawn to future-state problems, not just today's</li>
+                <li>World traveler — seeks new cultures and people</li>
+              </ul>
+            </div>
+            <div class="val-card c">
+              <div class="val-title">📊 Consistency</div>
+              <ul class="val-list">
+                <li>$4M+ Net-New ARR across 5.5 years closing</li>
+                <li>120%+ avg attainment at DocuSign &amp; Rippling</li>
+                <li>~80% pilot conversion rate</li>
+                <li>3× historical pipeline coverage</li>
+              </ul>
+            </div>
+            <div class="val-card d">
+              <div class="val-title">🚀 Leadership</div>
+              <ul class="val-list">
+                <li>12+ new hires mentored to ramp quota</li>
+                <li>11 people referred &amp; placed across 3 companies</li>
+                <li>6 trainings led across process &amp; product</li>
+                <li>Career mentor at Ohio State</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── STEP 2: PERFORMANCE ── -->
+      <div class="step-panel" id="panel-2">
+        <div class="panel-header">
+          <div class="panel-step-num">03</div>
+          <div>
+            <div class="panel-step-type">Step 3 of 6 · Performance Diagnostics</div>
+            <div class="panel-step-title">Revenue Metrics &amp; System Health Check</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">KPI Dashboard — 5.5 Year Closing History</div>
+          <div class="stat-grid">
+            <div class="stat"><div class="stat-val">$4M+</div><div class="stat-lbl">Net-New ARR<br>Booked</div></div>
+            <div class="stat"><div class="stat-val">6/7</div><div class="stat-lbl">Years at or<br>Above Quota</div></div>
+            <div class="stat"><div class="stat-val">120%+</div><div class="stat-lbl">Avg Attainment<br>DocuSign + Rippling</div></div>
+            <div class="stat"><div class="stat-val">~80%</div><div class="stat-lbl">Pilot<br>Conversion Rate</div></div>
+            <div class="stat"><div class="stat-val">3×</div><div class="stat-lbl">Historical Pipeline<br>Coverage</div></div>
+            <div class="stat"><div class="stat-val">Top 10%</div><div class="stat-lbl">Org Ranking<br>Both Companies</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">System Event Log</div>
+          <div class="log-row"><span class="log-src">Rippling</span><span class="log-lvl ok">PASS</span><span class="log-msg">Top 10% attainment · Enterprise mid-market · Multi-year agreement expansion</span></div>
+          <div class="log-row"><span class="log-src">Gong</span><span class="log-lvl ok">PASS</span><span class="log-msg">Competitive pilot win in cyber-insurance · Turned vulnerability into product demo via Gong</span></div>
+          <div class="log-row"><span class="log-src">DocuSign</span><span class="log-lvl ok">PASS</span><span class="log-msg">First SMB EBC · First CLM exception sale · 120%+ attainment · Mentored 6 AEs</span></div>
+          <div class="log-row"><span class="log-src">Venture</span><span class="log-lvl ev">EVENT</span><span class="log-msg">Launched <strong>live music co.</strong> in Park City, UT · Scaled to 6-figure revenue independently</span></div>
+          <div class="log-row"><span class="log-src">Personal</span><span class="log-lvl info">INFO</span><span class="log-msg">20+ ultramarathons · 1× 6k, 2× 5k, 6× 14k' mountaineering summits</span></div>
+        </div>
+      </div>
+
+      <!-- ── STEP 3: VALIDATION ── -->
+      <div class="step-panel" id="panel-3">
+        <div class="panel-header">
+          <div class="panel-step-num">04</div>
+          <div>
+            <div class="panel-step-type">Step 4 of 6 · Stakeholder Validation</div>
+            <div class="panel-step-title">External Verification — Leadership Attestations</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Reference Log</div>
+          <div class="quote">
+            <div class="quote-text">"Billy is not afraid of a challenge. He's forged new paths for HLS and his caliber of talent raised the bar for the entire team... Billy's business acumen, attention to detail and relentless approach to prospecting is advanced for what we typically see in an SMB AE."</div>
+            <div class="quote-src"><strong>Lacey Carlstrom</strong> · AVP, HLS Sales · DocuSign (Former Manager)</div>
+          </div>
+          <div class="quote">
+            <div class="quote-text">"Billy consistently delivers linear performance, drives customer success and is always prepared to succeed... He is a tremendous leader and will be for many years to come at DocuSign."</div>
+            <div class="quote-src"><strong>Greg Varga</strong> · RVP, Sales · DocuSign (Former Manager)</div>
+          </div>
+          <div class="quote">
+            <div class="quote-text">"What stood out most was his initiative and creativity: after a call where he felt he had missed the mark, he used Gong to identify the gaps, developed a concrete coaching plan, and shared it directly with our buyer. He turned a vulnerable moment into a powerful product demonstration."</div>
+            <div class="quote-src"><strong>Erik Koland</strong> · Head of Partnerships · Go Nimbly</div>
+          </div>
+          <div class="quote">
+            <div class="quote-text">"Billy thinks very strategically about the business and drives innovation... He will be a great business leader when ready and one of the people to drive the company to the future."</div>
+            <div class="quote-src"><strong>Manager Review</strong> · DocuSign Internal Performance Record</div>
+          </div>
+          <div class="quote">
+            <div class="quote-text">"Thanks for your thoughtful and kind note, Billy. Reinforces my view of you as a completely classy person. Tell your parents they must have done something right."</div>
+            <div class="quote-src"><strong>Dan Springer</strong> · CEO, Ironclad · Former CEO, DocuSign</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── STEP 4: REMEDIATION ── -->
+      <div class="step-panel" id="panel-4">
+        <div class="panel-header">
+          <div class="panel-step-num">05</div>
+          <div>
+            <div class="panel-step-type">Step 5 of 6 · Remediation Plan</div>
+            <div class="panel-step-title">Why Billy — The Fix That Actually Fits</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Solution Fit Assessment</div>
+          <div class="findings">
+            <div class="finding"><div class="finding-icon">🛠️</div><div class="finding-text"><strong>Entrepreneurial Spirit:</strong> Built a company from scratch, sold deals no one had sold before, treats every new environment like a product to ship. Zero playbook dependency.</div></div>
+            <div class="finding"><div class="finding-icon">📡</div><div class="finding-text"><strong>Early-Stage Ready:</strong> Consistently creates firsts — first SMB EBC, first CLM exception sale, first to break new HLS paths. That's exactly what early GTM demands.</div></div>
+            <div class="finding"><div class="finding-icon">🤝</div><div class="finding-text"><strong>Culture Multiplier:</strong> 12+ hires mentored, 11 referrals placed, 6 internal trainings led. Billy doesn't just hit his number — he raises the floor for the whole team.</div></div>
+            <div class="finding"><div class="finding-icon">🔬</div><div class="finding-text"><strong>AI-Native Mindset:</strong> Early adopter of tools like Gong for self-coaching. Deeply curious about AI's role in enterprise — not just a user, but a student of the technology Serval is building.</div></div>
+            <div class="finding"><div class="finding-icon">🏁</div><div class="finding-text"><strong>Long Game Mentality:</strong> Goals: enterprise seller → sales leader → scale a category-defining business. This isn't a stepping stone — Serval is the destination.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── STEP 5: RESOLVE ── -->
+      <div class="step-panel" id="panel-5">
+        <div class="panel-header">
+          <div class="panel-step-num">06</div>
+          <div>
+            <div class="panel-step-type">Step 6 of 6 · Resolution</div>
+            <div class="panel-step-title">Closing the Ticket — Let's Talk</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Final Resolution Checks</div>
+          <div class="terminal">
+            <div><span class="t-prompt">$</span> <span class="t-cmd">serval resolve --ticket INC-20260325-BH --resolver BH</span></div>
+            <br>
+            <div class="t-out">Running all resolution checks...</div>
+            <br>
+            <div><span class="t-key">✓ quota_performance</span>      <span class="t-ok">PASS</span>  <span class="t-val">[6/7 yrs · 120%+ avg attainment]</span></div>
+            <div><span class="t-key">✓ pipeline_discipline</span>    <span class="t-ok">PASS</span>  <span class="t-val">[3× coverage · ~80% pilot conv.]</span></div>
+            <div><span class="t-key">✓ culture_multiplier</span>     <span class="t-ok">PASS</span>  <span class="t-val">[12+ mentored · 11 referred]</span></div>
+            <div><span class="t-key">✓ stakeholder_refs</span>       <span class="t-ok">PASS</span>  <span class="t-val">[CEO · RVP · AVP · Partner]</span></div>
+            <div><span class="t-key">✓ early_stage_fit</span>        <span class="t-ok">PASS</span>  <span class="t-val">[entrepreneurial · no-playbook mode]</span></div>
+            <div><span class="t-key">✓ ai_curiosity</span>           <span class="t-ok">PASS</span>  <span class="t-val">[early adopter · deep conviction]</span></div>
+            <div><span class="t-key">✓ long_term_commitment</span>   <span class="t-ok">PASS</span>  <span class="t-val">[AE → leader → category builder]</span></div>
+            <br>
+            <div style="color:var(--serval-purple-light)">All checks passed. Resolver: BILLY HAINES</div>
+            <div style="color:var(--serval-purple-light)">Recommendation: CLOSE TICKET · HIRE IMMEDIATELY</div>
+          </div>
+        </div>
+        <div class="cta-card">
+          <div class="cta-title">Ready to resolve this incident?</div>
+          <div class="cta-sub">Billy is ready to build Serval's GTM motion from the ground up.<br>Let's close the ticket.</div>
+          <div class="contact-chips">
+            <div class="contact-chip">📧 william.haines34&#64;gmail.com</div>
+            <div class="contact-chip">📞 949-769-1783</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content-area -->
+
+    <!-- NAV -->
+    <div class="step-nav">
+      <button class="btn btn-ghost off" id="btn-back">← Back</button>
+      <span class="nav-indicator" id="nav-indicator">Step 1 of 6</span>
+      <button class="btn btn-purple" id="btn-fwd">Next Step →</button>
+    </div>
+
+  </div><!-- /main -->
+
+  <!-- RIGHT SIDEBAR -->
+  <div class="sidebar-right">
+    <div class="s-section">
+      <div class="s-section-title">Activity Feed</div>
+      <div id="activity-feed">
+        <div class="activity-item">
+          <div class="act-avatar">SV</div>
+          <div>
+            <div class="act-author">Serval System</div>
+            <div class="act-text">INC-20260325-BH created. P1 critical — GTM talent gap detected.</div>
+            <div class="act-time">Just now</div>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="act-avatar">BH</div>
+          <div>
+            <div class="act-author">Billy Haines</div>
+            <div class="act-text">Assigned as resolver. Triage in progress.</div>
+            <div class="act-time">Just now</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="s-section">
+      <div class="s-section-title">Related Tickets</div>
+      <div class="related-ticket"><span class="rt-id">INC-2024-DOCUSIGN</span><span class="rt-desc">Quota overachievement · 120%+ · Top 10% org</span></div>
+      <div class="related-ticket"><span class="rt-id">INC-2023-RIPPLING</span><span class="rt-desc">Enterprise expansion · Multi-year agreements</span></div>
+      <div class="related-ticket"><span class="rt-id">INC-2022-GONG</span><span class="rt-desc">Competitive pilot win · Unicorn cyber account</span></div>
+    </div>
+
+    <div class="s-section">
+      <div class="s-section-title">Tags</div>
+      <div class="tag-cloud">
+        <span class="tag tag-purple">GTM-Build</span>
+        <span class="tag tag-purple">AI-Native</span>
+        <span class="tag tag-purple">P1-Hire</span>
+        <span class="tag tag-grey">DocuSign</span>
+        <span class="tag tag-grey">Gong</span>
+        <span class="tag tag-grey">Rippling</span>
+        <span class="tag tag-grey">SaaS</span>
+        <span class="tag tag-grey">Early-Stage</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    let cur = 0;
+    const TOTAL = 6;
+    const slaStart = Date.now();
+
+    const actLog = [
+      { who: 'BH', name: 'Billy Haines', text: 'Root cause analysis complete. Core values system healthy — all four pillars active.' },
+      { who: 'BH', name: 'Billy Haines', text: 'Performance diagnostics done. $4M+ ARR confirmed. KPIs in the green.' },
+      { who: 'BH', name: 'Billy Haines', text: 'Stakeholder attestations collected. References from CEO, RVP, AVP, and partner confirmed.' },
+      { who: 'BH', name: 'Billy Haines', text: 'Remediation plan drafted. Fit score: HIGH. Early-stage AI GTM alignment confirmed.' },
+      { who: 'SV', name: 'Serval System', text: 'All 7 resolution checks PASSED. Recommendation: HIRE. Closing ticket.' },
+    ];
+
+    // SLA timer
+    setInterval(function () {
+      const s = Math.floor((Date.now() - slaStart) / 1000);
+      const m = String(Math.floor(s / 60)).padStart(2, '0');
+      const sc = String(s % 60).padStart(2, '0');
+      document.getElementById('sla-clock').textContent = 'SLA ' + m + ':' + sc;
+    }, 1000);
+
+    // Step row clicks
+    document.querySelectorAll('.step-row').forEach(function (row) {
+      row.addEventListener('click', function () {
+        const n = parseInt(row.getAttribute('data-step'));
+        if (n <= cur + 1) {
+          if (n > cur) addActivity(actLog[n - 1]);
+          cur = n;
+          updateUI();
+        }
+      });
+    });
+
+    // Nav buttons
+    document.getElementById('btn-back').addEventListener('click', function () {
+      if (cur > 0) { cur--; updateUI(); }
+    });
+
+    document.getElementById('btn-fwd').addEventListener('click', function () {
+      if (cur < TOTAL - 1) {
+        cur++;
+        addActivity(actLog[cur - 1]);
+        updateUI();
+      } else {
+        resolveIt();
+      }
+    });
+
+    function updateUI() {
+      // Show correct panel
+      document.querySelectorAll('.step-panel').forEach(function (p, i) {
+        p.classList.toggle('visible', i === cur);
+      });
+
+      // Sidebar step states
+      document.querySelectorAll('.step-row').forEach(function (r, i) {
+        r.classList.remove('active', 'done');
+        const node = r.querySelector('.step-node');
+        if (i < cur) {
+          r.classList.add('done');
+          node.textContent = '✓';
+        } else if (i === cur) {
+          r.classList.add('active');
+          node.textContent = i + 1;
+        } else {
+          node.textContent = i + 1;
+        }
+      });
+
+      // Progress bar
+      const pct = Math.round((cur / (TOTAL - 1)) * 100);
+      document.getElementById('prog-fill').style.width = pct + '%';
+      document.getElementById('prog-num').textContent = pct + '%';
+
+      // Step indicator
+      document.getElementById('nav-indicator').textContent = 'Step ' + (cur + 1) + ' of ' + TOTAL;
+
+      // Back button
+      document.getElementById('btn-back').classList.toggle('off', cur === 0);
+
+      // Forward button label
+      const btnFwd = document.getElementById('btn-fwd');
+      if (cur === TOTAL - 1) {
+        btnFwd.textContent = '✦ Close Ticket';
+        btnFwd.className = 'btn btn-resolve';
+      } else {
+        btnFwd.textContent = 'Next Step →';
+        btnFwd.className = 'btn btn-purple';
+      }
+
+      document.getElementById('main-scroll').scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function resolveIt() {
+      document.getElementById('resolved-banner').classList.add('show');
+      const badge = document.getElementById('status-badge');
+      badge.className = 'badge-status badge-resolved';
+      badge.textContent = '● Resolved';
+      document.getElementById('prog-fill').style.width = '100%';
+      document.getElementById('prog-num').textContent = '100%';
+      addActivity({ who: 'SV', name: 'Serval System', text: 'INC-20260325-BH RESOLVED. Billy Haines confirmed. Hire recommended.' });
+      document.getElementById('main-scroll').scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function addActivity(msg) {
+      const feed = document.getElementById('activity-feed');
+      const el = document.createElement('div');
+      el.className = 'activity-item';
+      el.style.animation = 'stepIn 0.3s ease';
+      el.innerHTML =
+        '<div class="act-avatar">' + msg.who + '</div>' +
+        '<div>' +
+          '<div class="act-author">' + msg.name + '</div>' +
+          '<div class="act-text">' + msg.text + '</div>' +
+          '<div class="act-time">Just now</div>' +
+        '</div>';
+      feed.insertBefore(el, feed.firstChild);
+    }
+  });
+</script>
