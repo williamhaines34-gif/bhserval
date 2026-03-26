@@ -17,9 +17,9 @@
     --lin-border2:   #D8D8D2;
 
     /* Accent */
-    --lin-purple:    #5E6AD2;
-    --lin-purple-dim:rgba(94,106,210,0.08);
-    --lin-purple-lt: #5E6AD2;
+    --lin-purple:    #3B82F6;
+    --lin-purple-dim:rgba(59,130,246,0.1);
+    --lin-purple-lt: #60A5FA;
 
     /* Billy Haines identity color — light blue */
     --bh-blue:       #3B82F6;
@@ -35,7 +35,7 @@
     /* Icon / status colors — all soft pastels */
     --icon-red:    #F87171;   /* light red */
     --icon-green:  #6EE7B7;   /* light green / mint */
-    --icon-purple: #93C5FD;   /* light purple / violet */
+    --icon-purple: #93C5FD;   /* light blue */
     --icon-yellow: #FCD34D;   /* light yellow / amber */
     --icon-blue:   #93C5FD;   /* light blue */
     --icon-orange: #FDBA74;   /* light orange */
@@ -44,7 +44,8 @@
     --red-bg:    #FEF2F2; --red-border:    #FECACA; --red-text:    #B91C1C;
     --green-bg:  #F0FDF4; --green-border:  #BBF7D0; --green-text:  #166534;
     --yellow-bg: #FFFBEB; --yellow-border: #FDE68A; --yellow-text: #92400E;
-    --purple-bg: #F5F3FF; --purple-border: #DDD6FE; --purple-text: #5B21B6;
+    --purple-bg: #EFF6FF; --purple-border: #BFDBFE; --purple-text: #2563EB;
+    --red: #B91C1C;
 
     --sans: 'Inter', system-ui, sans-serif;
   }
@@ -178,6 +179,14 @@
     height: 18px;
     border-radius: 4px;
     background: var(--bh-blue);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 1;
+  }
 
   .sb-section-label {
     padding: 10px 16px 3px;
@@ -346,7 +355,7 @@
 
   .prog-step.active {
     background: var(--lin-purple-dim);
-    border-color: rgba(94,106,210,0.25);
+    border-color: rgba(59,130,246,0.3);
     color: var(--lin-purple);
     font-weight: 600;
   }
@@ -361,7 +370,7 @@
 
   .prog-step.done::before {
     content: '✓';
-    color: var(--green);
+    color: var(--green-text);
     font-size: 10px;
     text-decoration: none;
     display: inline-block;
@@ -435,7 +444,7 @@
     height: 20px;
     border-radius: 4px;
     background: var(--lin-purple-dim);
-    border: 1px solid rgba(94,106,210,0.2);
+    border: 1px solid rgba(59,130,246,0.25);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -628,8 +637,8 @@
 
   /* CTA */
   .cta-block {
-    background: rgba(94,106,210,0.04);
-    border: 1px solid rgba(94,106,210,0.15);
+    background: rgba(59,130,246,0.06);
+    border: 1px solid rgba(59,130,246,0.2);
     border-radius: 7px;
     padding: 18px;
     text-align: center;
@@ -826,7 +835,7 @@
     color: #fff;
   }
 
-  .btn-primary:hover { background: #4F5BB8; }
+  .btn-primary:hover { background: #2563EB; }
 
   .btn-done {
     background: var(--lin-bg);
@@ -964,10 +973,10 @@
           <div class="block-head">📋 Candidate Overview</div>
           <div class="block-body">
             <div class="checklist">
-              <div class="check-item"><div class="check-icon">🎯</div><div class="check-text"><strong>The short version:</strong> 5.5+ years in quota-carrying SaaS roles at DocuSign, Gong, and Rippling. Hit quota 6 out of 7 years. Consistently top 10% of org. No playbook needed.</div></div>
-              <div class="check-item"><div class="check-icon">⚡</div><div class="check-text"><strong>What drives him:</strong> Seeks challenges — built a live music business, ran 20+ ultramarathons, and plans a 200-mile race in Oct 2026. Treats every new environment as a growth opportunity.</div></div>
-              <div class="check-item"><div class="check-icon">🔬</div><div class="check-text"><strong>Technical audience experience:</strong> Sold at Gong (revenue intelligence), Rippling (HRIS + payroll infra), and DocuSign (CLM/e-sign). Comfortable in rooms with developers, ops leaders, and product teams — exactly Linear's buyer.</div></div>
-              <div class="check-item"><div class="check-icon">📡</div><div class="check-text"><strong>Product-led growth fluency:</strong> Experienced the PLG → sales-assist motion firsthand at Rippling and Gong. Understands how to convert organic traction into durable expansion — precisely Linear's current motion.</div></div>
+              <div class="check-item"><div class="check-icon">🎯</div><div class="check-text"><strong>The short version:</strong> 5.5+ years in quota-carrying SaaS roles at DocuSign, Gong, and Rippling; quota hit in 6 of 7 years and top-10% performance.</div></div>
+              <div class="check-item"><div class="check-icon">⚡</div><div class="check-text"><strong>What drives him:</strong> Thrives in hard environments; built a six-figure business and completed 20+ ultramarathons.</div></div>
+              <div class="check-item"><div class="check-icon">🔬</div><div class="check-text"><strong>Technical audience experience:</strong> Proven with developer-adjacent buyers in revenue intelligence, HRIS/payroll infra, and CLM.</div></div>
+              <div class="check-item"><div class="check-icon">📡</div><div class="check-text"><strong>PLG fluency:</strong> Hands-on in PLG-to-sales motions and skilled at converting product pull into expansion revenue.</div></div>
             </div>
           </div>
         </div>
@@ -1036,10 +1045,10 @@
             </div>
 
             <div class="activity-log">
-              <div class="log-row"><div class="log-dot ok"></div><div class="log-body"><div class="log-label"><strong>Rippling</strong> — Enterprise mid-market · multi-year expansion · top 10% org</div></div></div>
-              <div class="log-row"><div class="log-dot ok"></div><div class="log-body"><div class="log-label"><strong>Gong</strong> — Competitive pilot win in cyber-insurance; used product to self-coach and close</div></div></div>
-              <div class="log-row"><div class="log-dot ok"></div><div class="log-body"><div class="log-label"><strong>DocuSign</strong> — First SMB EBC, first CLM exception sale, 120%+ attainment, mentored 6 AEs</div></div></div>
-              <div class="log-row"><div class="log-dot event"></div><div class="log-body"><div class="log-label"><strong>Venture</strong> — Founded live music co. in Park City, UT · scaled to 6-figure revenue independently</div></div></div>
+              <div class="log-row"><div class="log-dot ok"></div><div class="log-body"><div class="log-label"><strong>Rippling</strong> — Enterprise/mid-market expansion and top-10% org performance</div></div></div>
+              <div class="log-row"><div class="log-dot ok"></div><div class="log-body"><div class="log-label"><strong>Gong</strong> — Won a competitive pilot and used product data to improve close rates</div></div></div>
+              <div class="log-row"><div class="log-dot ok"></div><div class="log-body"><div class="log-label"><strong>DocuSign</strong> — 120%+ attainment, category-first wins, and AE mentorship</div></div></div>
+              <div class="log-row"><div class="log-dot event"></div><div class="log-body"><div class="log-label"><strong>Founder track</strong> — Built a live music company to six-figure annual revenue</div></div></div>
             </div>
           </div>
         </div>
@@ -1048,10 +1057,10 @@
           <div class="block-head">✅ Job Spec Mapping</div>
           <div class="block-body">
             <div class="checklist">
-              <div class="check-item"><div class="check-icon">✅</div><div class="check-text"><strong>5+ years quota-carrying:</strong> 5.5 years closing across three SaaS companies, all technically complex and fast-moving.</div></div>
-              <div class="check-item"><div class="check-icon">✅</div><div class="check-text"><strong>Selling to a technical audience:</strong> Gong (revenue intelligence platform), Rippling (developer-adjacent infra), DocuSign CLM — all required deep technical credibility with engineering and product buyers.</div></div>
-              <div class="check-item"><div class="check-icon">✅</div><div class="check-text"><strong>SaaS + startup comfort:</strong> All three roles were high-velocity, ambiguous, and fast-changing. Billy adapts and creates firsts — rather than following a playbook.</div></div>
-              <div class="check-item"><div class="check-icon">✅</div><div class="check-text"><strong>Voice of the customer:</strong> Led 6 internal trainings, mentored 12+ reps, and consistently translated customer signals back into product and process improvements.</div></div>
+              <div class="check-item"><div class="check-icon">✅</div><div class="check-text"><strong>5+ years quota-carrying:</strong> 5.5 years closing across three fast-growth SaaS companies.</div></div>
+              <div class="check-item"><div class="check-icon">✅</div><div class="check-text"><strong>Technical buyer credibility:</strong> Closed with engineering, ops, and product stakeholders in complex categories.</div></div>
+              <div class="check-item"><div class="check-icon">✅</div><div class="check-text"><strong>Startup comfort:</strong> Performs in ambiguity and repeatedly creates firsts without relying on a fixed playbook.</div></div>
+              <div class="check-item"><div class="check-icon">✅</div><div class="check-text"><strong>Voice of customer:</strong> Turns field signal into internal enablement and process improvement.</div></div>
             </div>
           </div>
         </div>
@@ -1079,12 +1088,8 @@
               <div class="quote-src"><strong>Greg Varga</strong> · RVP, Sales · DocuSign</div>
             </div>
             <div class="quote">
-              <div class="quote-text">"After a call where he felt he had missed the mark, he used Gong to identify the gaps, developed a coaching plan, and shared it with our buyer. He turned a vulnerable moment into a powerful product demo."</div>
+              <div class="quote-text">"After a missed call, he used Gong to map the gaps, built a coaching plan, and shared it with the buyer. He turned a weak moment into a strong product-led close."</div>
               <div class="quote-src"><strong>Erik Koland</strong> · Head of Partnerships · Go Nimbly</div>
-            </div>
-            <div class="quote">
-              <div class="quote-text">"Billy thinks very strategically about the business and drives innovation... He will be a great business leader and one of the people to drive the company to the future."</div>
-              <div class="quote-src"><strong>Manager Review</strong> · DocuSign Internal Performance Record</div>
             </div>
           </div>
         </div>
@@ -1104,17 +1109,17 @@
           <div class="block-head">🎯 The Fit — In Billy's Words</div>
           <div class="block-body">
             <div class="checklist">
-              <div class="check-item"><div class="check-icon">⚙️</div><div class="check-text"><strong>The product resonates:</strong> Linear is the tool that high-conviction product teams choose — teams that care about craft and execution. That's the exact buyer Billy's spent his career earning trust with: technical leaders who won't settle for noise.</div></div>
-              <div class="check-item"><div class="check-icon">📈</div><div class="check-text"><strong>PLG → sales motion:</strong> Linear is layering a sales motion on top of organic growth — the same transition Billy navigated at Rippling and Gong. He knows how to identify the right moments to engage, expand, and accelerate without disrupting the self-serve flywheel.</div></div>
-              <div class="check-item"><div class="check-icon">🏗️</div><div class="check-text"><strong>Early-stage GTM builder:</strong> Linear's GTM team is small and high-impact. Billy is drawn to building — not inheriting. He wants to help define how Linear sells, not follow a script someone else wrote.</div></div>
-              <div class="check-item"><div class="check-icon">🔊</div><div class="check-text"><strong>Voice of the customer:</strong> The JD explicitly asks for someone to advocate for customers and surface blockers to product. This is second nature — Billy has led 6 internal trainings and 12+ mentored hires, always translating the field back to the org.</div></div>
+              <div class="check-item"><div class="check-icon">⚙️</div><div class="check-text"><strong>Product match:</strong> Best with technical teams that value craft, speed, and operational rigor.</div></div>
+              <div class="check-item"><div class="check-icon">📈</div><div class="check-text"><strong>PLG-to-sales match:</strong> Already succeeded in the same motion Linear is scaling now.</div></div>
+              <div class="check-item"><div class="check-icon">🏗️</div><div class="check-text"><strong>Builder mindset:</strong> Prefers shaping early GTM systems over inheriting mature scripts.</div></div>
+              <div class="check-item"><div class="check-icon">🔊</div><div class="check-text"><strong>Customer signal loop:</strong> Strong record of translating field feedback into internal action.</div></div>
             </div>
           </div>
         </div>
 
         <div class="cta-block">
           <div class="cta-title">Ready to move BH-2026 to Done?</div>
-          <div class="cta-sub">Billy is built for this: a product-fluent AE who sells to technical buyers,<br>thrives in PLG environments, and builds from the ground up.</div>
+          <div class="cta-sub">Product-fluent AE, trusted by technical buyers, and proven in PLG expansion motions.</div>
           <div class="cta-chips">
             <div class="cta-chip">📧 william.haines34&#64;gmail.com</div>
             <div class="cta-chip">📞 949-769-1783</div>
