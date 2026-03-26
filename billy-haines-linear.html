@@ -1,0 +1,1275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BH-2026 · Linear</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --lin-bg:        #0F0F12;
+    --lin-sidebar:   #0A0A0D;
+    --lin-surface:   #141417;
+    --lin-surface2:  #1A1A1F;
+    --lin-border:    #222228;
+    --lin-border2:   #2E2E36;
+
+    --lin-purple:    #5E5CE6;
+    --lin-purple-mid:#7B79F7;
+    --lin-purple-lt: #9D9BFF;
+    --lin-purple-dim:rgba(94,92,230,0.12);
+    --lin-purple-glow:rgba(94,92,230,0.2);
+
+    --text-1:  #F0F0F2;
+    --text-2:  #C8C8D0;
+    --text-3:  #7A7A88;
+    --text-4:  #44444E;
+
+    --green:   #26C281;
+    --orange:  #E8833A;
+    --red:     #E85050;
+
+    --sans: 'Inter', system-ui, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--lin-bg);
+    color: var(--text-1);
+    font-family: var(--sans);
+    font-size: 13px;
+    line-height: 1.5;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── TOPBAR ── */
+  .topbar {
+    height: 44px;
+    background: var(--lin-sidebar);
+    border-bottom: 1px solid var(--lin-border);
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    gap: 0;
+    flex-shrink: 0;
+  }
+
+  .tb-left {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    flex: 1;
+  }
+
+  .lin-logo {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-1);
+    letter-spacing: -0.3px;
+    padding-right: 16px;
+    border-right: 1px solid var(--lin-border);
+    margin-right: 12px;
+    flex-shrink: 0;
+  }
+
+  .lin-logo-mark {
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(135deg, var(--lin-purple), var(--lin-purple-mid));
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    color: var(--text-3);
+  }
+
+  .breadcrumb .bc-sep { color: var(--lin-border2); }
+  .breadcrumb .bc-active { color: var(--text-2); font-weight: 500; }
+  .breadcrumb .bc-issue { color: var(--lin-purple-lt); font-weight: 500; }
+
+  .tb-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .tb-kbd {
+    padding: 3px 7px;
+    background: var(--lin-surface2);
+    border: 1px solid var(--lin-border2);
+    border-radius: 4px;
+    font-size: 10px;
+    color: var(--text-3);
+    font-family: monospace;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── LAYOUT ── */
+  .layout {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: 224px;
+    background: var(--lin-sidebar);
+    border-right: 1px solid var(--lin-border);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    overflow-y: auto;
+    padding: 8px 0;
+  }
+
+  .sidebar::-webkit-scrollbar { width: 3px; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--lin-border2); border-radius: 2px; }
+
+  .sb-workspace {
+    padding: 6px 10px 10px;
+    border-bottom: 1px solid var(--lin-border);
+    margin-bottom: 6px;
+  }
+
+  .sb-ws-row {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 6px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  .sb-ws-row:hover { background: var(--lin-surface); }
+
+  .ws-avatar {
+    width: 20px;
+    height: 20px;
+    border-radius: 5px;
+    background: linear-gradient(135deg, var(--lin-purple), var(--lin-purple-mid));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  .ws-name { font-size: 12px; font-weight: 600; color: var(--text-2); }
+
+  .sb-section-label {
+    padding: 8px 16px 4px;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-4);
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+  }
+
+  .sb-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    font-size: 12.5px;
+    color: var(--text-3);
+    cursor: pointer;
+    border-radius: 0;
+    transition: all 0.1s;
+    white-space: nowrap;
+  }
+
+  .sb-item:hover { background: var(--lin-surface); color: var(--text-2); }
+  .sb-item.active { background: var(--lin-surface); color: var(--text-1); }
+  .sb-item.active .sb-dot { background: var(--lin-purple); }
+
+  .sb-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--text-4);
+    flex-shrink: 0;
+  }
+
+  .sb-count {
+    margin-left: auto;
+    font-size: 10px;
+    color: var(--text-4);
+    background: var(--lin-surface2);
+    padding: 1px 6px;
+    border-radius: 10px;
+  }
+
+  .sb-item.active .sb-count {
+    background: var(--lin-purple-dim);
+    color: var(--lin-purple-lt);
+  }
+
+  /* ── MAIN CONTENT ── */
+  .main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--lin-bg);
+  }
+
+  /* Issue header */
+  .issue-header {
+    padding: 20px 32px 0;
+    flex-shrink: 0;
+  }
+
+  .issue-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .issue-id {
+    font-size: 11px;
+    font-family: monospace;
+    color: var(--lin-purple-lt);
+    background: var(--lin-purple-dim);
+    border: 1px solid rgba(94,92,230,0.2);
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-weight: 500;
+  }
+
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+
+  .status-inprogress {
+    background: rgba(232,131,58,0.1);
+    border: 1px solid rgba(232,131,58,0.25);
+    color: var(--orange);
+  }
+
+  .status-done {
+    background: rgba(38,194,129,0.1);
+    border: 1px solid rgba(38,194,129,0.25);
+    color: var(--green);
+  }
+
+  .priority-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 7px;
+    background: var(--lin-surface2);
+    border: 1px solid var(--lin-border2);
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--red);
+    letter-spacing: 0.3px;
+  }
+
+  .issue-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-1);
+    letter-spacing: -0.5px;
+    line-height: 1.3;
+    margin-bottom: 6px;
+  }
+
+  .issue-title .hi { color: var(--lin-purple-lt); }
+
+  .issue-sub {
+    font-size: 12px;
+    color: var(--text-3);
+    margin-bottom: 16px;
+  }
+
+  /* Progress bar */
+  .progress-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 32px;
+    border-bottom: 1px solid var(--lin-border);
+    flex-shrink: 0;
+  }
+
+  .prog-steps {
+    display: flex;
+    gap: 4px;
+  }
+
+  .prog-step {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 11px;
+    border-radius: 5px;
+    font-size: 11.5px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid var(--lin-border);
+    color: var(--text-4);
+    background: transparent;
+    transition: all 0.15s;
+    white-space: nowrap;
+    font-family: var(--sans);
+  }
+
+  .prog-step:hover { border-color: var(--lin-purple); color: var(--lin-purple-lt); }
+
+  .prog-step.active {
+    background: var(--lin-purple-dim);
+    border-color: rgba(94,92,230,0.35);
+    color: var(--lin-purple-lt);
+    font-weight: 600;
+  }
+
+  .prog-step.done {
+    background: transparent;
+    border-color: var(--lin-border);
+    color: var(--text-3);
+    text-decoration: line-through;
+    text-decoration-color: var(--text-4);
+  }
+
+  .prog-step.done::before {
+    content: '✓';
+    color: var(--green);
+    font-size: 10px;
+    text-decoration: none;
+    display: inline-block;
+    margin-right: 2px;
+  }
+
+  .prog-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .prog-track {
+    width: 80px;
+    height: 2px;
+    background: var(--lin-border2);
+    border-radius: 1px;
+    overflow: hidden;
+  }
+
+  .prog-fill {
+    height: 100%;
+    background: var(--lin-purple);
+    border-radius: 1px;
+    width: 0%;
+    transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .prog-pct {
+    font-size: 11px;
+    font-family: monospace;
+    color: var(--lin-purple-lt);
+    min-width: 32px;
+  }
+
+  /* Issue body */
+  .issue-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px 32px;
+  }
+
+  .issue-body::-webkit-scrollbar { width: 4px; }
+  .issue-body::-webkit-scrollbar-thumb { background: var(--lin-border2); border-radius: 2px; }
+
+  /* Step panels */
+  .step-panel { display: none; }
+  .step-panel.visible {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    animation: fadeUp 0.25s ease;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(5px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Section heading */
+  .sec-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 2px;
+  }
+
+  .sec-num {
+    width: 22px;
+    height: 22px;
+    border-radius: 5px;
+    background: var(--lin-purple-dim);
+    border: 1px solid rgba(94,92,230,0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--lin-purple-lt);
+    flex-shrink: 0;
+    font-family: monospace;
+  }
+
+  .sec-type {
+    font-size: 9.5px;
+    font-weight: 600;
+    color: var(--text-4);
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+  }
+
+  .sec-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-1);
+    letter-spacing: -0.2px;
+  }
+
+  /* Content blocks */
+  .block {
+    background: var(--lin-surface);
+    border: 1px solid var(--lin-border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .block-head {
+    padding: 9px 14px;
+    background: rgba(255,255,255,0.02);
+    border-bottom: 1px solid var(--lin-border);
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-4);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .block-body { padding: 14px; }
+
+  /* Stats */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 7px;
+  }
+
+  .stat {
+    background: var(--lin-surface2);
+    border: 1px solid var(--lin-border);
+    border-radius: 6px;
+    padding: 11px 10px;
+    text-align: center;
+  }
+
+  .stat-v {
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--lin-purple-lt);
+    line-height: 1;
+    margin-bottom: 4px;
+    letter-spacing: -0.5px;
+    font-family: monospace;
+  }
+
+  .stat-l {
+    font-size: 10px;
+    color: var(--text-3);
+    line-height: 1.3;
+  }
+
+  /* Checklist items */
+  .checklist { display: flex; flex-direction: column; gap: 7px; }
+
+  .check-item {
+    display: flex;
+    gap: 9px;
+    align-items: flex-start;
+    padding: 9px 11px;
+    background: var(--lin-surface2);
+    border-radius: 6px;
+    border-left: 2px solid var(--lin-purple);
+  }
+
+  .check-icon { font-size: 13px; flex-shrink: 0; margin-top: 1px; }
+
+  .check-text {
+    font-size: 12.5px;
+    color: var(--text-2);
+    line-height: 1.5;
+  }
+
+  .check-text strong { color: var(--lin-purple-lt); font-weight: 600; }
+
+  /* 2-col grid */
+  .two-col {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 7px;
+  }
+
+  .prop-card {
+    background: var(--lin-surface2);
+    border: 1px solid var(--lin-border);
+    border-radius: 6px;
+    padding: 11px 12px;
+    border-top: 2px solid var(--lin-purple);
+  }
+
+  .prop-card.b { border-top-color: #60A5FA; }
+  .prop-card.c { border-top-color: #A78BFA; }
+  .prop-card.d { border-top-color: var(--orange); }
+
+  .prop-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-1);
+    margin-bottom: 7px;
+  }
+
+  .prop-list { list-style: none; display: flex; flex-direction: column; gap: 3px; }
+
+  .prop-list li {
+    font-size: 11px;
+    color: var(--text-3);
+    display: flex;
+    gap: 6px;
+    line-height: 1.4;
+  }
+
+  .prop-list li::before { content: '·'; color: var(--lin-purple); font-weight: 900; flex-shrink: 0; }
+  .prop-card.b .prop-list li::before { color: #60A5FA; }
+  .prop-card.c .prop-list li::before { color: #A78BFA; }
+  .prop-card.d .prop-list li::before { color: var(--orange); }
+
+  /* Quote */
+  .quote {
+    background: var(--lin-surface2);
+    border: 1px solid var(--lin-border);
+    border-left: 2px solid var(--lin-purple);
+    border-radius: 0 6px 6px 0;
+    padding: 10px 13px;
+    margin-bottom: 7px;
+  }
+
+  .quote:last-child { margin-bottom: 0; }
+  .quote-text { font-size: 12px; color: var(--text-2); line-height: 1.6; font-style: italic; margin-bottom: 5px; }
+  .quote-src { font-size: 10px; color: var(--text-4); font-family: monospace; }
+  .quote-src strong { color: var(--lin-purple-lt); }
+
+  /* Activity log */
+  .activity-log { display: flex; flex-direction: column; gap: 0; }
+
+  .log-row {
+    display: flex;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--lin-border);
+    align-items: flex-start;
+    font-size: 11.5px;
+  }
+
+  .log-row:last-child { border-bottom: none; }
+
+  .log-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--lin-purple);
+    flex-shrink: 0;
+    margin-top: 5px;
+  }
+
+  .log-dot.ok    { background: var(--green); }
+  .log-dot.event { background: var(--orange); }
+
+  .log-body { flex: 1; }
+  .log-label { color: var(--text-2); line-height: 1.4; }
+  .log-label strong { color: var(--text-1); font-weight: 600; }
+  .log-meta { font-size: 10px; color: var(--text-4); font-family: monospace; margin-top: 2px; }
+
+  /* CTA */
+  .cta-block {
+    background: linear-gradient(135deg, rgba(94,92,230,0.07), rgba(94,92,230,0.03));
+    border: 1px solid rgba(94,92,230,0.2);
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+  }
+
+  .cta-title { font-size: 15px; font-weight: 700; color: var(--text-1); letter-spacing: -0.4px; margin-bottom: 6px; }
+  .cta-sub   { font-size: 12px; color: var(--text-3); margin-bottom: 14px; line-height: 1.5; }
+
+  .cta-chips {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .cta-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: var(--lin-surface2);
+    border: 1px solid var(--lin-border2);
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-2);
+    font-family: monospace;
+  }
+
+  /* Resolved */
+  .resolved-banner {
+    display: none;
+    background: rgba(38,194,129,0.06);
+    border: 1px solid rgba(38,194,129,0.2);
+    border-radius: 7px;
+    padding: 11px 16px;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: fadeUp 0.3s ease;
+  }
+
+  .resolved-banner.hidden { display: none; }
+  .resolved-banner.show   { display: flex; }
+
+  .resolved-title { font-size: 12.5px; font-weight: 600; color: var(--green); }
+  .resolved-sub   { font-size: 11px; color: var(--text-3); margin-top: 1px; }
+
+  /* Issue properties panel */
+  .properties-panel {
+    width: 220px;
+    flex-shrink: 0;
+    border-left: 1px solid var(--lin-border);
+    background: var(--lin-surface);
+    overflow-y: auto;
+    padding: 16px;
+  }
+
+  .properties-panel::-webkit-scrollbar { width: 3px; }
+  .properties-panel::-webkit-scrollbar-thumb { background: var(--lin-border2); border-radius: 2px; }
+
+  .prop-section-title {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-4);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .prop-row {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    margin-bottom: 12px;
+  }
+
+  .prop-key {
+    font-size: 10px;
+    color: var(--text-4);
+    font-weight: 500;
+  }
+
+  .prop-val {
+    font-size: 12px;
+    color: var(--text-2);
+    font-weight: 500;
+  }
+
+  .prop-val.purple { color: var(--lin-purple-lt); }
+
+  .assignee-mini {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 9px;
+    background: var(--lin-surface2);
+    border: 1px solid var(--lin-border);
+    border-radius: 6px;
+    margin-bottom: 12px;
+  }
+
+  .mini-av {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--lin-purple), var(--lin-purple-mid));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  .mini-name { font-size: 11.5px; font-weight: 600; color: var(--text-1); }
+  .mini-role { font-size: 10px; color: var(--text-4); }
+
+  .label-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 500;
+    margin-bottom: 4px;
+    margin-right: 4px;
+  }
+
+  .lt-purple { background: var(--lin-purple-dim); border: 1px solid rgba(94,92,230,0.2); color: var(--lin-purple-lt); }
+  .lt-grey   { background: var(--lin-surface2); border: 1px solid var(--lin-border); color: var(--text-3); }
+  .lt-green  { background: rgba(38,194,129,0.08); border: 1px solid rgba(38,194,129,0.2); color: var(--green); }
+
+  .activity-feed-mini { display: flex; flex-direction: column; gap: 0; }
+
+  .af-item {
+    display: flex;
+    gap: 7px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--lin-border);
+  }
+
+  .af-item:last-child { border-bottom: none; }
+
+  .af-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--lin-purple);
+    flex-shrink: 0;
+    margin-top: 5px;
+  }
+
+  .af-text { font-size: 11px; color: var(--text-3); line-height: 1.4; }
+  .af-text strong { color: var(--text-2); font-weight: 500; }
+  .af-time { font-size: 9px; color: var(--text-4); font-family: monospace; margin-top: 2px; }
+
+  /* Bottom nav */
+  .bottom-nav {
+    background: var(--lin-surface);
+    border-top: 1px solid var(--lin-border);
+    padding: 10px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    font-family: var(--sans);
+    transition: all 0.15s;
+  }
+
+  .btn-ghost {
+    background: transparent;
+    border: 1px solid var(--lin-border2);
+    color: var(--text-3);
+  }
+
+  .btn-ghost:hover { background: var(--lin-surface2); color: var(--text-2); }
+  .btn-ghost.off   { opacity: 0.25; pointer-events: none; }
+
+  .btn-primary {
+    background: var(--lin-purple);
+    color: #fff;
+    box-shadow: 0 1px 8px rgba(94,92,230,0.3);
+  }
+
+  .btn-primary:hover { background: var(--lin-purple-mid); box-shadow: 0 2px 14px rgba(94,92,230,0.45); transform: translateY(-1px); }
+
+  .btn-done {
+    background: transparent;
+    border: 1px solid var(--green);
+    color: var(--green);
+    font-weight: 700;
+  }
+
+  .btn-done:hover { background: rgba(38,194,129,0.1); }
+
+  .nav-label {
+    font-size: 11px;
+    font-family: monospace;
+    color: var(--text-4);
+  }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="tb-left">
+    <div class="lin-logo">
+      <div class="lin-logo-mark">
+        <svg width="12" height="12" viewBox="0 0 100 100" fill="none">
+          <path d="M10 90L90 10M10 10L90 90" stroke="white" stroke-width="18" stroke-linecap="round"/>
+        </svg>
+      </div>
+      Linear
+    </div>
+    <div class="breadcrumb">
+      <span>GTM</span>
+      <span class="bc-sep">/</span>
+      <span>Hiring</span>
+      <span class="bc-sep">/</span>
+      <span class="bc-active">Account Executive, Growth</span>
+      <span class="bc-sep">/</span>
+      <span class="bc-issue">BH-2026</span>
+    </div>
+  </div>
+  <div class="tb-right">
+    <span class="tb-kbd">⌘K</span>
+    <span class="tb-kbd">?</span>
+  </div>
+</div>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sb-workspace">
+      <div class="sb-ws-row">
+        <div class="ws-avatar">BH</div>
+        <div class="ws-name">Billy Haines</div>
+      </div>
+    </div>
+
+    <div class="sb-section-label">My Issues</div>
+    <div class="sb-item"><div class="sb-dot"></div>Assigned to me<span class="sb-count">1</span></div>
+    <div class="sb-item active"><div class="sb-dot"></div>In Progress<span class="sb-count">1</span></div>
+    <div class="sb-item"><div class="sb-dot"></div>Completed<span class="sb-count">3</span></div>
+
+    <div class="sb-section-label" style="margin-top:8px">Projects</div>
+    <div class="sb-item active">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="1" width="10" height="10" rx="2" stroke="currentColor" stroke-width="1.2"/><path d="M4 6h4M4 4h2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+      AE Growth · Hiring
+      <span class="sb-count">1</span>
+    </div>
+
+    <div class="sb-section-label" style="margin-top:8px">Views</div>
+    <div class="sb-item">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="currentColor" stroke-width="1.2"/><path d="M6 3v3l2 2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+      Active
+    </div>
+    <div class="sb-item">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6h8M2 3h8M2 9h5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+      Backlog
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <!-- Issue header -->
+    <div class="issue-header">
+      <div class="issue-meta-row">
+        <span class="issue-id">BH-2026</span>
+        <span class="status-pill status-inprogress" id="status-pill">◐ In Progress</span>
+        <span class="priority-badge">↑ Urgent</span>
+      </div>
+      <div class="issue-title">Candidate: <span class="hi">Billy Haines</span> — Account Executive, Growth</div>
+      <div class="issue-sub">Assigned · GTM Hiring · Linear · Opened Mar 25, 2026</div>
+    </div>
+
+    <!-- Progress -->
+    <div class="progress-row">
+      <div class="prog-steps" id="prog-steps">
+        <button class="prog-step active" data-step="0">01 · Who Is Billy</button>
+        <button class="prog-step" data-step="1">02 · Results &amp; Fit</button>
+        <button class="prog-step" data-step="2">03 · References</button>
+        <button class="prog-step" data-step="3">04 · Why Linear</button>
+      </div>
+      <div class="prog-right">
+        <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+        <div class="prog-pct" id="prog-pct">0%</div>
+      </div>
+    </div>
+
+    <!-- Issue body -->
+    <div class="issue-body" id="issue-body">
+
+      <div class="resolved-banner hidden" id="resolved-banner">
+        <div>
+          <div class="resolved-title">✓ Issue resolved — Candidate cleared for interview</div>
+          <div class="resolved-sub">BH-2026 · Billy Haines · AE Growth · Linear</div>
+        </div>
+      </div>
+
+      <!-- ── STEP 0: WHO IS BILLY ── -->
+      <div class="step-panel visible" id="panel-0">
+        <div class="sec-head">
+          <div class="sec-num">01</div>
+          <div>
+            <div class="sec-type">Profile</div>
+            <div class="sec-title">Who is Billy, and why does this role fit?</div>
+          </div>
+        </div>
+
+        <div class="block">
+          <div class="block-head">📋 Candidate Overview</div>
+          <div class="block-body">
+            <div class="checklist">
+              <div class="check-item"><div class="check-icon">🎯</div><div class="check-text"><strong>The short version:</strong> 5.5+ years in quota-carrying SaaS roles at DocuSign, Gong, and Rippling. Hit quota 6 out of 7 years. Consistently top 10% of org. No playbook needed.</div></div>
+              <div class="check-item"><div class="check-icon">⚡</div><div class="check-text"><strong>What drives him:</strong> Seeks challenges — built a live music business, ran 20+ ultramarathons, and plans a 200-mile race in Oct 2026. Treats every new environment as a growth opportunity.</div></div>
+              <div class="check-item"><div class="check-icon">🔬</div><div class="check-text"><strong>Technical audience experience:</strong> Sold at Gong (revenue intelligence), Rippling (HRIS + payroll infra), and DocuSign (CLM/e-sign). Comfortable in rooms with developers, ops leaders, and product teams — exactly Linear's buyer.</div></div>
+              <div class="check-item"><div class="check-icon">📡</div><div class="check-text"><strong>Product-led growth fluency:</strong> Experienced the PLG → sales-assist motion firsthand at Rippling and Gong. Understands how to convert organic traction into durable expansion — precisely Linear's current motion.</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="block">
+          <div class="block-head">⚡ Core Attributes</div>
+          <div class="block-body">
+            <div class="two-col">
+              <div class="prop-card">
+                <div class="prop-title">🔥 Challenges</div>
+                <ul class="prop-list">
+                  <li>Founded 6-figure live music business</li>
+                  <li>20+ ultramarathons · mountaineering summits</li>
+                  <li>200-mile ultra: October 2026</li>
+                </ul>
+              </div>
+              <div class="prop-card b">
+                <div class="prop-title">🧠 Curiosity</div>
+                <ul class="prop-list">
+                  <li>Obsessed with AI and builder tools</li>
+                  <li>Early adopter — self-coached with Gong AI</li>
+                  <li>Mentors at Ohio State; lifelong learner</li>
+                </ul>
+              </div>
+              <div class="prop-card c">
+                <div class="prop-title">📊 Consistency</div>
+                <ul class="prop-list">
+                  <li>$4M+ Net-New ARR across 5.5 years</li>
+                  <li>120%+ avg attainment · 3× pipeline</li>
+                  <li>~80% pilot conversion rate</li>
+                </ul>
+              </div>
+              <div class="prop-card d">
+                <div class="prop-title">🚀 Leadership</div>
+                <ul class="prop-list">
+                  <li>12+ new hires mentored to quota</li>
+                  <li>11 referrals placed across 3 companies</li>
+                  <li>6 internal trainings led</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── STEP 1: RESULTS + FIT ── -->
+      <div class="step-panel" id="panel-1">
+        <div class="sec-head">
+          <div class="sec-num">02</div>
+          <div>
+            <div class="sec-type">Performance + Role Fit</div>
+            <div class="sec-title">Revenue track record mapped to the job spec</div>
+          </div>
+        </div>
+
+        <div class="block">
+          <div class="block-head">📈 Key Metrics</div>
+          <div class="block-body">
+            <div class="stats-row" style="margin-bottom:14px">
+              <div class="stat"><div class="stat-v">$4M+</div><div class="stat-l">Net-New ARR Booked</div></div>
+              <div class="stat"><div class="stat-v">120%+</div><div class="stat-l">Avg Attainment (DocuSign + Rippling)</div></div>
+              <div class="stat"><div class="stat-v">6/7</div><div class="stat-l">Years at or Above Quota</div></div>
+              <div class="stat"><div class="stat-v">~80%</div><div class="stat-l">Pilot Conversion Rate</div></div>
+              <div class="stat"><div class="stat-v">3×</div><div class="stat-l">Historical Pipeline Coverage</div></div>
+              <div class="stat"><div class="stat-v">Top 10%</div><div class="stat-l">Org Ranking (Both Companies)</div></div>
+            </div>
+
+            <div class="activity-log">
+              <div class="log-row"><div class="log-dot ok"></div><div class="log-body"><div class="log-label"><strong>Rippling</strong> — Enterprise mid-market · multi-year expansion · top 10% org</div></div></div>
+              <div class="log-row"><div class="log-dot ok"></div><div class="log-body"><div class="log-label"><strong>Gong</strong> — Competitive pilot win in cyber-insurance; used product to self-coach and close</div></div></div>
+              <div class="log-row"><div class="log-dot ok"></div><div class="log-body"><div class="log-label"><strong>DocuSign</strong> — First SMB EBC, first CLM exception sale, 120%+ attainment, mentored 6 AEs</div></div></div>
+              <div class="log-row"><div class="log-dot event"></div><div class="log-body"><div class="log-label"><strong>Venture</strong> — Founded live music co. in Park City, UT · scaled to 6-figure revenue independently</div></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="block">
+          <div class="block-head">✅ Job Spec Mapping</div>
+          <div class="block-body">
+            <div class="checklist">
+              <div class="check-item"><div class="check-icon">✅</div><div class="check-text"><strong>5+ years quota-carrying:</strong> 5.5 years closing across three SaaS companies, all technically complex and fast-moving.</div></div>
+              <div class="check-item"><div class="check-icon">✅</div><div class="check-text"><strong>Selling to a technical audience:</strong> Gong (revenue intelligence platform), Rippling (developer-adjacent infra), DocuSign CLM — all required deep technical credibility with engineering and product buyers.</div></div>
+              <div class="check-item"><div class="check-icon">✅</div><div class="check-text"><strong>SaaS + startup comfort:</strong> All three roles were high-velocity, ambiguous, and fast-changing. Billy adapts and creates firsts — rather than following a playbook.</div></div>
+              <div class="check-item"><div class="check-icon">✅</div><div class="check-text"><strong>Voice of the customer:</strong> Led 6 internal trainings, mentored 12+ reps, and consistently translated customer signals back into product and process improvements.</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── STEP 2: REFERENCES ── -->
+      <div class="step-panel" id="panel-2">
+        <div class="sec-head">
+          <div class="sec-num">03</div>
+          <div>
+            <div class="sec-type">Social Proof</div>
+            <div class="sec-title">What leaders who've worked with Billy say</div>
+          </div>
+        </div>
+
+        <div class="block">
+          <div class="block-head">💬 References</div>
+          <div class="block-body">
+            <div class="quote">
+              <div class="quote-text">"His caliber of talent raised the bar for the entire team... Billy's business acumen, attention to detail and relentless approach to prospecting is advanced for what we typically see in an SMB AE."</div>
+              <div class="quote-src"><strong>Lacey Carlstrom</strong> · AVP, HLS Sales · DocuSign</div>
+            </div>
+            <div class="quote">
+              <div class="quote-text">"Billy consistently delivers linear performance, drives customer success and is always prepared to succeed... He takes ownership of his territory and challenges customers to think beyond the obvious."</div>
+              <div class="quote-src"><strong>Greg Varga</strong> · RVP, Sales · DocuSign</div>
+            </div>
+            <div class="quote">
+              <div class="quote-text">"After a call where he felt he had missed the mark, he used Gong to identify the gaps, developed a coaching plan, and shared it with our buyer. He turned a vulnerable moment into a powerful product demo."</div>
+              <div class="quote-src"><strong>Erik Koland</strong> · Head of Partnerships · Go Nimbly</div>
+            </div>
+            <div class="quote">
+              <div class="quote-text">"Billy thinks very strategically about the business and drives innovation... He will be a great business leader and one of the people to drive the company to the future."</div>
+              <div class="quote-src"><strong>Manager Review</strong> · DocuSign Internal Performance Record</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── STEP 3: WHY LINEAR ── -->
+      <div class="step-panel" id="panel-3">
+        <div class="sec-head">
+          <div class="sec-num">04</div>
+          <div>
+            <div class="sec-type">Motivation</div>
+            <div class="sec-title">Why Linear, and why now</div>
+          </div>
+        </div>
+
+        <div class="block">
+          <div class="block-head">🎯 The Fit — In Billy's Words</div>
+          <div class="block-body">
+            <div class="checklist">
+              <div class="check-item"><div class="check-icon">⚙️</div><div class="check-text"><strong>The product resonates:</strong> Linear is the tool that high-conviction product teams choose — teams that care about craft and execution. That's the exact buyer Billy's spent his career earning trust with: technical leaders who won't settle for noise.</div></div>
+              <div class="check-item"><div class="check-icon">📈</div><div class="check-text"><strong>PLG → sales motion:</strong> Linear is layering a sales motion on top of organic growth — the same transition Billy navigated at Rippling and Gong. He knows how to identify the right moments to engage, expand, and accelerate without disrupting the self-serve flywheel.</div></div>
+              <div class="check-item"><div class="check-icon">🏗️</div><div class="check-text"><strong>Early-stage GTM builder:</strong> Linear's GTM team is small and high-impact. Billy is drawn to building — not inheriting. He wants to help define how Linear sells, not follow a script someone else wrote.</div></div>
+              <div class="check-item"><div class="check-icon">🔊</div><div class="check-text"><strong>Voice of the customer:</strong> The JD explicitly asks for someone to advocate for customers and surface blockers to product. This is second nature — Billy has led 6 internal trainings and 12+ mentored hires, always translating the field back to the org.</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="cta-block">
+          <div class="cta-title">Ready to move BH-2026 to Done?</div>
+          <div class="cta-sub">Billy is built for this: a product-fluent AE who sells to technical buyers,<br>thrives in PLG environments, and builds from the ground up.</div>
+          <div class="cta-chips">
+            <div class="cta-chip">📧 william.haines34&#64;gmail.com</div>
+            <div class="cta-chip">📞 949-769-1783</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /issue-body -->
+
+    <!-- Bottom nav -->
+    <div class="bottom-nav">
+      <button class="btn btn-ghost off" id="btn-back">← Previous</button>
+      <span class="nav-label" id="nav-label">01 / 04</span>
+      <button class="btn btn-primary" id="btn-fwd">Next →</button>
+    </div>
+  </div>
+
+  <!-- PROPERTIES PANEL -->
+  <div class="properties-panel">
+    <div class="prop-section-title">Properties</div>
+
+    <div class="prop-row">
+      <div class="prop-key">Status</div>
+      <span class="status-pill status-inprogress" id="sidebar-status" style="font-size:10px;padding:2px 7px">◐ In Progress</span>
+    </div>
+
+    <div class="prop-row">
+      <div class="prop-key">Priority</div>
+      <div class="prop-val" style="color:var(--red)">↑ Urgent</div>
+    </div>
+
+    <div class="prop-row">
+      <div class="prop-key">Assignee</div>
+      <div class="assignee-mini">
+        <div class="mini-av">BH</div>
+        <div>
+          <div class="mini-name">Billy Haines</div>
+          <div class="mini-role">AE Candidate</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="prop-row">
+      <div class="prop-key">Project</div>
+      <div class="prop-val purple">AE Growth · Hiring</div>
+    </div>
+
+    <div class="prop-row">
+      <div class="prop-key">Cycle</div>
+      <div class="prop-val">Mar 25 – Apr 4, 2026</div>
+    </div>
+
+    <div class="prop-row">
+      <div class="prop-key">Labels</div>
+      <div style="margin-top:4px">
+        <span class="label-tag lt-purple">GTM</span>
+        <span class="label-tag lt-purple">Growth</span>
+        <span class="label-tag lt-green">PLG-fluent</span>
+        <span class="label-tag lt-grey">DocuSign</span>
+        <span class="label-tag lt-grey">Gong</span>
+        <span class="label-tag lt-grey">Rippling</span>
+      </div>
+    </div>
+
+    <div style="margin-top:16px">
+      <div class="prop-section-title">Activity</div>
+      <div class="activity-feed-mini" id="activity-feed">
+        <div class="af-item"><div class="af-dot"></div><div><div class="af-text"><strong>BH-2026</strong> created and assigned</div><div class="af-time">just now</div></div></div>
+        <div class="af-item"><div class="af-dot"></div><div><div class="af-text">Status set to <strong>In Progress</strong></div><div class="af-time">just now</div></div></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  let cur = 0;
+  const TOTAL = 4;
+
+  const actLog = [
+    'Results & Fit reviewed — $4M+ ARR, 6/7 years quota confirmed',
+    'References checked — CEO, RVP, AVP, partner all positive',
+    'Motivation assessed — PLG + technical buyer fit confirmed',
+  ];
+
+  document.querySelectorAll('.prog-step').forEach(function (s) {
+    s.addEventListener('click', function () {
+      const n = parseInt(s.getAttribute('data-step'));
+      if (n <= cur + 1) { cur = n; updateUI(); }
+    });
+  });
+
+  document.getElementById('btn-back').addEventListener('click', function () {
+    if (cur > 0) { cur--; updateUI(); }
+  });
+
+  document.getElementById('btn-fwd').addEventListener('click', function () {
+    if (cur < TOTAL - 1) { cur++; addActivity(actLog[cur - 1]); updateUI(); }
+    else { resolveIt(); }
+  });
+
+  function updateUI() {
+    document.querySelectorAll('.step-panel').forEach(function (p, i) {
+      p.classList.toggle('visible', i === cur);
+    });
+
+    document.querySelectorAll('.prog-step').forEach(function (s, i) {
+      s.classList.remove('active', 'done');
+      if (i < cur)       s.classList.add('done');
+      else if (i === cur) s.classList.add('active');
+    });
+
+    const pct = Math.round((cur / (TOTAL - 1)) * 100);
+    document.getElementById('prog-fill').style.width = pct + '%';
+    document.getElementById('prog-pct').textContent = pct + '%';
+    document.getElementById('nav-label').textContent = '0' + (cur + 1) + ' / 0' + TOTAL;
+
+    document.getElementById('btn-back').classList.toggle('off', cur === 0);
+
+    const btnFwd = document.getElementById('btn-fwd');
+    if (cur === TOTAL - 1) {
+      btnFwd.textContent = '✓ Mark Done';
+      btnFwd.className = 'btn btn-done';
+    } else {
+      btnFwd.textContent = 'Next →';
+      btnFwd.className = 'btn btn-primary';
+    }
+
+    document.getElementById('issue-body').scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function resolveIt() {
+    document.getElementById('resolved-banner').classList.remove('hidden');
+    document.getElementById('resolved-banner').classList.add('show');
+
+    const sp = document.getElementById('status-pill');
+    sp.className = 'status-pill status-done';
+    sp.textContent = '✓ Done';
+
+    const ss = document.getElementById('sidebar-status');
+    ss.className = 'status-pill status-done';
+    ss.textContent = '✓ Done';
+    ss.style.cssText = 'font-size:10px;padding:2px 7px';
+
+    document.getElementById('prog-fill').style.width = '100%';
+    document.getElementById('prog-pct').textContent = '100%';
+    addActivity('BH-2026 marked Done — candidate cleared for interview');
+    document.getElementById('issue-body').scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function addActivity(text) {
+    const feed = document.getElementById('activity-feed');
+    const el = document.createElement('div');
+    el.className = 'af-item';
+    el.innerHTML = '<div class="af-dot"></div><div><div class="af-text">' + text + '</div><div class="af-time">just now</div></div>';
+    feed.insertBefore(el, feed.firstChild);
+  }
+});
+</script>
+</body>
+</html>
